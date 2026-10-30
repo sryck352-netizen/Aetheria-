@@ -1,0 +1,92 @@
+name: Aetheria - APK Android (protótipo)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - Aetheria_Noctis_3D_Proto03_Com_Musica.zip
+
+permissions:
+  contents: write
+
+jobs:
+  compilar-apk:
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Conferir os arquivos do projeto
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s Aetheria_Noctis_3D_Proto03_Com_Musica.zip || { echo "::error::Envie primeiro o ZIP do projeto à raiz do repositório."; exit 1; }
+          mkdir -p game
+          unzip -q Aetheria_Noctis_3D_Proto03_Com_Musica.zip -d game
+          test -f game/Aetheria_Noctis_Godot4_Proto03_Com_Musica/project.godot
+          test -f game/Aetheria_Noctis_Godot4_Proto03_Com_Musica/assets/characters/Noctis_Base_3D.glb
+          test -f game/Aetheria_Noctis_Godot4_Proto03_Com_Musica/assets/audio/Aetheria_Tema_de_Abertura.ogg
+
+      - name: Configurar modelos de exportação do Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/share/godot/export_templates"
+          SOURCE="/root/.local/share/godot/export_templates/4.4.1.stable"
+          TARGET="$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          if [ ! -d "$TARGET" ] && [ -d "$SOURCE" ]; then
+            cp -a "$SOURCE" "$TARGET"
+          fi
+          test -d "$TARGET" || { echo "::error::Modelos de exportação Android ausentes no container."; exit 1; }
+
+      - name: Preparar chave de testes para Android
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+
+      - name: Importar arquivos 3D e conferir scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd game/Aetheria_Noctis_Godot4_Proto03_Com_Musica
+          godot --headless --editor --import --path . --quit
+
+      - name: Gerar APK de teste
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd game/Aetheria_Noctis_Godot4_Proto03_Com_Musica
+          mkdir -p builds
+          godot --headless --path . --export-debug Android builds/Aetheria-Noctis-Android.apk
+          test -s builds/Aetheria-Noctis-Android.apk
+          cp builds/Aetheria-Noctis-Android.apk "$GITHUB_WORKSPACE/Aetheria-Noctis-Android.apk"
+
+      - name: Anexar APK à execução
+        uses: actions/upload-artifact@v4
+        with:
+          name: Aetheria-Noctis-APK-TESTE
+          path: Aetheria-Noctis-Android.apk
+          if-no-files-found: error
+
+      - name: Publicar link HTTPS de download do APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: proto03-android
+          name: Aetheria Android - Protótipo técnico de Nóctis 03
+          prerelease: true
+          make_latest: false
+          files: Aetheria-Noctis-Android.apk
+          body: |
+            Versão técnica de testes gerada automaticamente pelo Godot 4.
+            Não é o jogo 3D cinematográfico completo e ainda precisa de testes no celular.
+            A trilha enviada para a abertura está incluída no projeto.

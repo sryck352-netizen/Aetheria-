@@ -60,6 +60,9 @@ jobs:
         run: |
           set -euo pipefail
           cd game/Aetheria_Noctis_Godot4_Proto03_Com_Musica
+          # Godot em Linux headless precisa importar ETC2/ASTC para o Android.
+          sed -i '/^\[rendering\]/a textures/vram_compression/import_etc2_astc=true' project.godot
+          grep -q 'textures/vram_compression/import_etc2_astc=true' project.godot
           godot --headless --editor --path . --import
 
       - name: Compilar APK de teste

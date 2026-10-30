@@ -38,6 +38,15 @@ jobs:
         run: |
           set -euo pipefail
           godot --version
+          # GitHub Actions altera HOME para /github/home; copiar configuracoes
+          # do container de build, criadas originalmente em /root.
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          mkdir -p "$HOME/.config/godot"
+          test -s /root/.local/share/godot/export_templates/4.4.1.stable/android_debug.apk
+          cp -a /root/.local/share/godot/export_templates/4.4.1.stable/. "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
+          cp -a /root/.config/godot/editor_settings-4.4.tres "$HOME/.config/godot/editor_settings-4.4.tres"
+          grep -q 'java_sdk_path' "$HOME/.config/godot/editor_settings-4.4.tres"
+          test -s "$HOME/.local/share/godot/export_templates/4.4.1.stable/android_debug.apk"
           mkdir -p "$HOME/.android"
           if [ ! -f "$HOME/.android/debug.keystore" ]; then
             keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname 'CN=Android Debug,O=Android,C=US'

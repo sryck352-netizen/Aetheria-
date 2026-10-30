@@ -1,29 +1,32 @@
-# Aetheria: Ecos da Aurora — Android
+# Aetheria: Ecos da Aurora — protótipo Android
 
-Este repositório prepara a **compilação automática de um APK do protótipo Godot 4**.
+O projeto Godot 4 **Proto03** já foi enviado ao GitHub, com cenário 3D, personagem-base Nóctis, Aria, inimigo, interface e música de abertura.
 
-**Importante:** o projeto 3D atual (Protótipo 03) é uma versão técnica provisória. Ele ainda **não é o RPG cinematográfico completo** aprovado nas 18 etapas. O modelo definitivo e as animações de Nóctis ainda não foram concluídos.
+## Baixar APK no Chrome
 
-## Como gerar o APK usando o Chrome
+Depois que a compilação do GitHub Actions terminar com sucesso, o instalador será publicado aqui:
 
-1. Envie para a raiz deste repositório o arquivo `Aetheria_Noctis_3D_Proto03_Com_Musica.zip` do projeto original. O arquivo precisa manter exatamente esse nome.
-2. No GitHub, abra **Actions → Aetheria - APK Android → Run workflow**. O envio do ZIP para a branch `main` também inicia a compilação.
-3. Espere a execução terminar com sucesso. Em **Releases**, aparecerá uma versão de **teste**, com o APK para Android.
-4. Baixe o APK pelo Chrome e instale no celular, autorizando instalações dessa origem quando solicitado.
+**https://github.com/sryck352-netizen/Aetheria-/releases**
 
-Se o processo falhar, abra a execução vermelha em **Actions** para ver a mensagem do compilador. Não existe APK até uma execução concluir com sucesso.
+Na versão `aetheria-proto03-android`, escolha **Aetheria-Noctis-Android.apk** (não selecione o Source code ZIP).
 
-## Arquivos necessários
+**Importante:** o link só funcionará depois de uma compilação bem-sucedida. Consulte o estado em [Actions](https://github.com/sryck352-netizen/Aetheria-/actions).
 
-- `Aetheria_Noctis_3D_Proto03_Com_Musica.zip` — necessário, ainda não enviado;
-- `.github/workflows/aetheria-android.yml` — automação de compilação;
-- `README.md` — instruções.
+## Como o projeto foi armazenado
 
-## Limites atuais
+Os 7,5 MB do arquivo ZIP original foram divididos em 20 partes Base64 na pasta `archive_parts/`. O GitHub Actions reconstrói o arquivo original e verifica o SHA-256:
 
-- O trabalho anterior contém um modelo 3D base para Nóctis, terreno, combate inicial e música na tela de abertura.
-- Ainda não possui o personagem cinematográfico definitivo, todas as animações, regiões ou sistemas completos.
-- A compilação e o funcionamento no Galaxy A15 precisam ser comprovados por testes.
-- Antes de distribuir publicamente os modelos e a música extraída do vídeo, confirme que possui os direitos necessários.
+`ee5ab25028cdf8838e0f364f551cfdb7764bd0abec9923a913551b3d93cda748`.
 
-**Não confundir o APK de teste com o jogo completo.**
+Depois utiliza Godot 4.4.1 para importar o projeto e tentar exportar o APK Android.
+
+## Limitações da versão
+
+**Isto ainda é um protótipo técnico, não o RPG cinematográfico completo das 18 etapas.**
+
+- Não é o modelo 3D definitivo de Nóctis: mantém a versão provisória rejeitada como visual final.
+- Ainda faltam rig e animações articuladas, grande parte do mundo, chefes, outros personagens e sistemas completos.
+- O funcionamento no Galaxy A15 ainda depende de testes no dispositivo.
+- A música foi extraída do vídeo fornecido pelo criador. Antes de distribuir publicamente o APK, confirme que possui os direitos necessários sobre o áudio.
+
+Para desenvolvimento futuro, não publique como versão final até a aprovação visual e os testes de jogabilidade.
